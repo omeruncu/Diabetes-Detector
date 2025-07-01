@@ -1,5 +1,7 @@
+import joblib
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+import joblib
 
 
 def encode_categorical_features(df):
@@ -31,5 +33,5 @@ def scale_numerical_features(df, columns):
     """
     scaler = StandardScaler()
     df[columns] = scaler.fit_transform(df[columns])
-    return df
+    return df, scaler
 
