@@ -1,0 +1,2 @@
+data_source:
+  raw_data: data/raw/diabetes.csv
