@@ -1,10 +1,13 @@
-import src.features.build_features as fb
-import src.features.encode_scale as fes
 import pandas as pd
 import numpy as np
 import streamlit as st
 import joblib
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+import src.features.build_features as fb
+import src.features.encode_scale as fes
 
 model = joblib.load("models/random_forest_diabetes_model.pkl")
 features = joblib.load("models/selected_features.pkl")
