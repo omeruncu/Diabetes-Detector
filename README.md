@@ -49,6 +49,8 @@ We welcome any suggestions, improvements and development contributions! Please c
 
 ## Streamlit
 
+* [https://diabetes-detector.streamlit.app](https://diabetes-detector.streamlit.app)
+
 <!-- CONTACT -->
 ## Contact
 
