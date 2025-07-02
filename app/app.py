@@ -21,6 +21,7 @@ from sklearn.linear_model import LogisticRegression
 
 if not isinstance(model, LogisticRegression):
     st.warning("⚠️ Uyarı: Yüklenen model Logistic Regression değil!")
+st.write("📦 Model tipi:", type(model))
 
 # Başlık
 st.title("🩺 Diabetes Risk Predictor")
@@ -68,6 +69,7 @@ scaled_cols = [
 input_df[scaled_cols] = scaler.transform(input_df[scaled_cols])
 
 missing_features = [col for col in features if col not in input_df.columns]
+
 if missing_features:
     st.error(f"❌ Eksik sütunlar: {missing_features}")
 else:
