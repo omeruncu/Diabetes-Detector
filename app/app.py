@@ -67,7 +67,7 @@ scaled_cols = [
 # ✅ Eğitimde kullanılan scaler ile transform
 df_encoded[scaled_cols] = scaler.transform(df_encoded[scaled_cols])
 
-df_encoded = df_encoded[features].values
+df_encoded = df_encoded[features]
 
 # Tahmin
 if st.button("Tahmin Et"):
@@ -79,6 +79,6 @@ if st.button("Tahmin Et"):
     st.markdown(f"### 🔍 Sonuç: {'🟥 **Diyabetli**' if prediction == 1 else '🟩 **Diyabetli Değil**'}")
     st.markdown(f"### 📊 Olasılık: **{prob:.2%}**")
 
-    if st.checkbox("📈 Özelliklerin Etkisini Göster"):
-        coefs = pd.Series(model.coef_[0], index=features).sort_values(key=abs, ascending=False)
-        st.bar_chart(coefs)
+if st.checkbox("📈 Özelliklerin Etkisini Göster"):
+    coefs = pd.Series(model.coef_[0], index=features).sort_values(key=abs, ascending=False)
+    st.bar_chart(coefs)
