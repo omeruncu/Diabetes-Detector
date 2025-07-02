@@ -17,12 +17,6 @@ model = joblib.load("models/best_model.pkl")
 features = joblib.load("models/selected_features.pkl")
 scaler = joblib.load("models/scaler.pkl")  # Eğitimde kaydedilen scaler
 
-from sklearn.linear_model import LogisticRegression
-
-if not isinstance(model, LogisticRegression):
-    st.warning("⚠️ Uyarı: Yüklenen model Logistic Regression değil!")
-st.write("📦 Model tipi:", type(model))
-
 # Başlık
 st.title("🩺 Diabetes Risk Predictor")
 st.markdown("### Lütfen aşağıdaki bilgileri girin:")
@@ -50,13 +44,20 @@ input_df = pd.DataFrame([{
 }])
 
 # Özellik mühendisliği
+input_df["IS_OUTLIER"] = 0
 input_df = fb.apply_all_feature_engineering(input_df)
 input_df["INSULIN_FLAG"] = fb.add_insulin_flag(input_df)["INSULIN_FLAG"]
-input_df["IS_OUTLIER"] = 0
-input_df["PREGNANCY_FLAG"] = np.where(input_df["PREGNANCIES"] > 0, 1, 0)
 
-# Encoding
-input_df = fes.encode_categorical_features(input_df)
+st.write("📋 input_df sütunları:", input_df.columns.tolist())
+st.write("🔍 İlk satırlar:", input_df.head())
+st.write("📊 Veri tipleri:", input_df.dtypes)
+
+df_encoded = fes.encode_categorical_features(input_df)
+df_encoded["PREGNANCY_FLAG"] = df_encoded["PREGNANCY_FLAG"].map({"NO": 0, "YES": 1})
+df_encoded["INSULIN_FLAG"] = df_encoded["INSULIN_FLAG"].map({"UNMEASURED": 0, "MEASURED": 1})
+
+bool_cols = df_encoded.select_dtypes(include="bool").columns
+df_encoded[bool_cols] = df_encoded[bool_cols].astype(int)
 
 # Ölçeklenecek sütunlar
 scaled_cols = [
@@ -65,30 +66,28 @@ scaled_cols = [
     "INSULIN", "AGE_X_PREGNANCIES"
 ]
 
+st.write("📋 df_encoded 1 sütunları:", df_encoded.columns.tolist())
+st.write("🔍 İlk satırlar:", df_encoded.head())
+st.write("📊 Veri tipleri:", df_encoded.dtypes)
+
 # ✅ Eğitimde kullanılan scaler ile transform
-input_df[scaled_cols] = scaler.transform(input_df[scaled_cols])
+df_encoded[scaled_cols] = scaler.transform(df_encoded[scaled_cols])
 
-missing_features = [col for col in features if col not in input_df.columns]
+st.write("📋 df_encoded 2 sütunları:", df_encoded.columns.tolist())
+st.write("🔍 İlk satırlar:", df_encoded.head())
+st.write("📊 Veri tipleri:", df_encoded.dtypes)
 
-if missing_features:
-    st.error(f"❌ Eksik sütunlar: {missing_features}")
-else:
-    user_input_df = input_df[features]
-
-# Modelin beklediği sıraya göre input vektörü oluştur
-user_input_df = input_df[features]
+df_encoded = df_encoded[features].values
 
 # Tahmin
 if st.button("Tahmin Et"):
-    if missing_features:
-        st.error("Tahmin yapılamıyor. Eksik sütunlar var.")
-    else:
-        prediction = model.predict(user_input_df)[0]
-        prob = model.predict_proba(user_input_df)[0][1]
 
-        st.markdown("---")
-        st.markdown(f"### 🔍 Sonuç: {'🟥 **Diyabetli**' if prediction == 1 else '🟩 **Diyabetli Değil**'}")
-        st.markdown(f"### 📊 Olasılık: **{prob:.2%}**")
+    prediction = model.predict(df_encoded)[0]
+    prob = model.predict_proba(df_encoded)[0][1]
+
+    st.markdown("---")
+    st.markdown(f"### 🔍 Sonuç: {'🟥 **Diyabetli**' if prediction == 1 else '🟩 **Diyabetli Değil**'}")
+    st.markdown(f"### 📊 Olasılık: **{prob:.2%}**")
 
     if st.checkbox("📈 Özelliklerin Etkisini Göster"):
         coefs = pd.Series(model.coef_[0], index=features).sort_values(key=abs, ascending=False)
