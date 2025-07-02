@@ -63,12 +63,12 @@ scaled_cols = [
 input_df[scaled_cols] = scaler.transform(input_df[scaled_cols])
 
 # Modelin beklediği sıraya göre input vektörü oluştur
-user_input = input_df[features].values
+user_input_df = input_df[features]
 
 # Tahmin
 if st.button("Tahmin Et"):
-    prediction = model.predict(user_input)[0]
-    prob = model.predict_proba(user_input)[0][1]
+    prediction = model.predict(user_input_df)[0]
+    prob = model.predict_proba(user_input_df)[0][1]
 
     st.markdown("---")
     st.markdown(f"### 🔍 Sonuç: {'🟥 **Diyabetli**' if prediction == 1 else '🟩 **Diyabetli Değil**'}")
