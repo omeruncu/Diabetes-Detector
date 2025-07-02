@@ -1,6 +1,6 @@
 import joblib
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 import joblib
 
 
@@ -20,18 +20,27 @@ def encode_categorical_features(df):
     return df
 
 
-def scale_numerical_features(df, columns):
+def scale_numerical_features(df, columns, method="standard"):
     """
-    Belirtilen sayısal sütunları StandardScaler ile ölçekler.
+    Belirtilen sayısal sütunları ölçekler.
 
     Args:
         df (pd.DataFrame): Girdi veri seti
         columns (list): Ölçeklenecek sütun isimleri
+        method (str): 'standard' veya 'robust' ölçekleme yöntemi
 
     Returns:
         pd.DataFrame: Ölçeklenmiş veri seti
+        scaler: Kullanılan scaler nesnesi
     """
-    scaler = StandardScaler()
+    if method == "standard":
+        scaler = StandardScaler()
+    elif method == "robust":
+        scaler = RobustScaler()
+    else:
+        raise ValueError("method parametresi 'standard' veya 'robust' olmalıdır.")
+
     df[columns] = scaler.fit_transform(df[columns])
     return df, scaler
+
 
