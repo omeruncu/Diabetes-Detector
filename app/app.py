@@ -13,7 +13,7 @@ import src.features.build_features as fb
 import src.features.encode_scale as fes
 
 # Model, özellik listesi ve scaler'ı yükle
-model = joblib.load("models/random_forest_diabetes_model.pkl")
+model = joblib.load("models/best_model.pkl")
 features = joblib.load("models/selected_features.pkl")
 scaler = joblib.load("models/scaler.pkl")  # Eğitimde kaydedilen scaler
 
