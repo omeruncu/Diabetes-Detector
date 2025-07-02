@@ -17,6 +17,11 @@ model = joblib.load("models/best_model.pkl")
 features = joblib.load("models/selected_features.pkl")
 scaler = joblib.load("models/scaler.pkl")  # Eğitimde kaydedilen scaler
 
+from sklearn.linear_model import LogisticRegression
+
+if not isinstance(model, LogisticRegression):
+    st.warning("⚠️ Uyarı: Yüklenen model Logistic Regression değil!")
+
 # Başlık
 st.title("🩺 Diabetes Risk Predictor")
 st.markdown("### Lütfen aşağıdaki bilgileri girin:")
@@ -62,14 +67,27 @@ scaled_cols = [
 # ✅ Eğitimde kullanılan scaler ile transform
 input_df[scaled_cols] = scaler.transform(input_df[scaled_cols])
 
+missing_features = [col for col in features if col not in input_df.columns]
+if missing_features:
+    st.error(f"❌ Eksik sütunlar: {missing_features}")
+else:
+    user_input_df = input_df[features]
+
 # Modelin beklediği sıraya göre input vektörü oluştur
 user_input_df = input_df[features]
 
 # Tahmin
 if st.button("Tahmin Et"):
-    prediction = model.predict(user_input_df)[0]
-    prob = model.predict_proba(user_input_df)[0][1]
+    if missing_features:
+        st.error("Tahmin yapılamıyor. Eksik sütunlar var.")
+    else:
+        prediction = model.predict(user_input_df)[0]
+        prob = model.predict_proba(user_input_df)[0][1]
 
-    st.markdown("---")
-    st.markdown(f"### 🔍 Sonuç: {'🟥 **Diyabetli**' if prediction == 1 else '🟩 **Diyabetli Değil**'}")
-    st.markdown(f"### 📊 Olasılık: **{prob:.2%}**")
+        st.markdown("---")
+        st.markdown(f"### 🔍 Sonuç: {'🟥 **Diyabetli**' if prediction == 1 else '🟩 **Diyabetli Değil**'}")
+        st.markdown(f"### 📊 Olasılık: **{prob:.2%}**")
+
+    if st.checkbox("📈 Özelliklerin Etkisini Göster"):
+        coefs = pd.Series(model.coef_[0], index=features).sort_values(key=abs, ascending=False)
+        st.bar_chart(coefs)
