@@ -67,7 +67,13 @@ scaled_cols = [
 # ✅ Eğitimde kullanılan scaler ile transform
 df_encoded[scaled_cols] = scaler.transform(df_encoded[scaled_cols])
 
-df_encoded = df_encoded[features]
+selected_features = [
+    'PREGNANCIES', 'GLUCOSE', 'BLOODPRESSURE', 'SKINTHICKNESS',
+    'INSULIN', 'BMI', 'DIABETESPEDIGREEFUNCTION', 'AGE',
+    'AGE_X_PREGNANCIES', 'GLUCOSE_LEVEL_Diabetes'
+]
+
+df_encoded = df_encoded[selected_features]
 
 # Tahmin
 if st.button("Tahmin Et"):
