@@ -48,9 +48,6 @@ input_df["IS_OUTLIER"] = 0
 input_df = fb.apply_all_feature_engineering(input_df)
 input_df["INSULIN_FLAG"] = fb.add_insulin_flag(input_df)["INSULIN_FLAG"]
 
-st.write("📋 input_df sütunları:", input_df.columns.tolist())
-st.write("🔍 İlk satırlar:", input_df.head())
-st.write("📊 Veri tipleri:", input_df.dtypes)
 
 df_encoded = fes.encode_categorical_features(input_df)
 df_encoded["PREGNANCY_FLAG"] = df_encoded["PREGNANCY_FLAG"].map({"NO": 0, "YES": 1})
@@ -66,16 +63,9 @@ scaled_cols = [
     "INSULIN", "AGE_X_PREGNANCIES"
 ]
 
-st.write("📋 df_encoded 1 sütunları:", df_encoded.columns.tolist())
-st.write("🔍 İlk satırlar:", df_encoded.head())
-st.write("📊 Veri tipleri:", df_encoded.dtypes)
 
 # ✅ Eğitimde kullanılan scaler ile transform
 df_encoded[scaled_cols] = scaler.transform(df_encoded[scaled_cols])
-
-st.write("📋 df_encoded 2 sütunları:", df_encoded.columns.tolist())
-st.write("🔍 İlk satırlar:", df_encoded.head())
-st.write("📊 Veri tipleri:", df_encoded.dtypes)
 
 df_encoded = df_encoded[features].values
 
