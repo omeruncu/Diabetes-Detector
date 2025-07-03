@@ -14,7 +14,7 @@ import src.features.encode_scale as fes
 
 # Model, özellik listesi ve scaler'ı yükle
 model = joblib.load("models/best_model.pkl")
-features = joblib.load("models/selected_features.pkl")
+features = joblib.load("models/feature_names.pkl")
 scaler = joblib.load("models/scaler.pkl")  # Eğitimde kaydedilen scaler
 
 # Başlık
@@ -44,7 +44,6 @@ input_df = pd.DataFrame([{
 }])
 
 # Özellik mühendisliği
-input_df["IS_OUTLIER"] = 0
 input_df = fb.apply_all_feature_engineering(input_df)
 input_df["INSULIN_FLAG"] = fb.add_insulin_flag(input_df)["INSULIN_FLAG"]
 
@@ -57,23 +56,12 @@ bool_cols = df_encoded.select_dtypes(include="bool").columns
 df_encoded[bool_cols] = df_encoded[bool_cols].astype(int)
 
 # Ölçeklenecek sütunlar
-scaled_cols = [
-    "PREGNANCIES", "BLOODPRESSURE", "SKINTHICKNESS",
-    "GLUCOSE", "BMI", "AGE", "DIABETESPEDIGREEFUNCTION",
-    "INSULIN", "AGE_X_PREGNANCIES"
-]
+scaled_cols = df_encoded.columns.tolist()
 
 
 # ✅ Eğitimde kullanılan scaler ile transform
 df_encoded[scaled_cols] = scaler.transform(df_encoded[scaled_cols])
 
-selected_features = [
-    'PREGNANCIES', 'GLUCOSE', 'BLOODPRESSURE', 'SKINTHICKNESS',
-    'INSULIN', 'BMI', 'DIABETESPEDIGREEFUNCTION', 'AGE',
-    'AGE_X_PREGNANCIES', 'GLUCOSE_LEVEL_Diabetes'
-]
-
-df_encoded = df_encoded[selected_features]
 
 # Tahmin
 if st.button("Tahmin Et"):
